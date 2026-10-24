@@ -4,6 +4,7 @@ import IsobarMap from '../components/IsobarMap.jsx'
 import FrontBar from '../components/FrontBar.jsx'
 import { motions, people } from '../data.js'
 import { seedOf } from '../lib/contours.js'
+import { themeOf } from '../lib/theme.js'
 import NotFound from './NotFound.jsx'
 
 export default function Profile() {
@@ -47,7 +48,7 @@ export default function Profile() {
           {debates.length ? (
             <ul className="readings">
               {debates.map((m) => (
-                <li key={m.id}>
+                <li key={m.id} className={themeOf(m).className}>
                   <Link to={m.status === 'closed' ? `/verdict/${m.id}` : `/match/${m.id}`}>
                     <span className="r-title">{m.title}<small>Argued {m.for === p.handle ? 'For' : 'Against'}, {m.when ?? 'live now'}</small></span>
                     <FrontBar share={m.share} />

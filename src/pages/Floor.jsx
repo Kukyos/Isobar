@@ -4,6 +4,7 @@ import Nav from '../components/Nav.jsx'
 import IsobarMap from '../components/IsobarMap.jsx'
 import SideLabel from '../components/SideLabel.jsx'
 import { byId, people } from '../data.js'
+import { themeOf } from '../lib/theme.js'
 import NotFound from './NotFound.jsx'
 
 const NAME = { for: 'For', against: 'Against' }
@@ -57,7 +58,7 @@ function FloorView({ m }) {
   }
 
   return (
-    <>
+    <div className={themeOf(m).className}>
       <Nav />
       <header className="floor-head">
         <IsobarMap id={m.id} share={m.share} w={1200} h={420} />
@@ -98,6 +99,6 @@ function FloorView({ m }) {
         </div>
         <div className="cols">{column('for')}{column('against')}</div>
       </main>
-    </>
+    </div>
   )
 }

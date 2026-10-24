@@ -5,6 +5,7 @@ import Front from '../components/Front.jsx'
 import FrontBar from '../components/FrontBar.jsx'
 import { Sky } from '../components/IsobarMap.jsx'
 import { byId, people, shareOf, verdict } from '../data.js'
+import { themeOf } from '../lib/theme.js'
 import NotFound from './NotFound.jsx'
 
 const NAME = { for: 'For', against: 'Against' }
@@ -38,8 +39,8 @@ function VerdictView({ m }) {
   )
 
   return (
-    <>
-      <Front share={shown} className="verdict-band">
+    <div className={themeOf(m).className}>
+      <Front share={shown} theme={themeOf(m)} className="verdict-band">
         <Nav onDark />
         <div className="band-in wrap">
           <p className="live">Verdict, {m.when?.toLowerCase() ?? 'just now'}, {m.judges.toLocaleString()} judges</p>
@@ -76,6 +77,6 @@ function VerdictView({ m }) {
           </div>
         </section>
       </main>
-    </>
+    </div>
   )
 }

@@ -7,6 +7,7 @@ import FrontBar from '../components/FrontBar.jsx'
 import { Sky } from '../components/IsobarMap.jsx'
 import { Storm } from './Feed.jsx'
 import { motions, people } from '../data.js'
+import { themeOf } from '../lib/theme.js'
 import { useLiveShare } from '../lib/useLive.js'
 
 const live = motions.find((m) => m.status === 'live')
@@ -24,7 +25,7 @@ export default function Landing() {
 
   return (
     <>
-      <Front share={share} className="hero">
+      <Front share={share} theme={themeOf(live)} className="hero">
         <Nav onDark />
         <div className="hero-in">
           <p className="live"><span className="pulse" aria-hidden="true" />Live now, {live.judges.toLocaleString()} people judging</p>
@@ -75,7 +76,7 @@ export default function Landing() {
           <p className="sec-sub">No speakers, no clock. Anyone can add an argument and the best ones rise.</p>
           <ul className="readings">
             {floor.map((m) => (
-              <li key={m.id}>
+              <li key={m.id} className={themeOf(m).className}>
                 <Link to={`/floor/${m.id}`}>
                   <span className="r-title">{m.title}</span>
                   <FrontBar share={m.share} />

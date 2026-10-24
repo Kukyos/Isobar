@@ -6,6 +6,7 @@ import SideLabel from '../components/SideLabel.jsx'
 import FrontBar from '../components/FrontBar.jsx'
 import IsobarMap from '../components/IsobarMap.jsx'
 import { motions, people, topics, verdict } from '../data.js'
+import { themeOf } from '../lib/theme.js'
 import { useLiveShare } from '../lib/useLive.js'
 
 export default function Feed() {
@@ -28,7 +29,7 @@ export default function Feed() {
 
         {pick(live) && (
           <Link to={`/match/${live.id}`} className="live-tile">
-            <Front share={share}>
+            <Front share={share} theme={themeOf(live)}>
               <div className="live-tile-in">
                 <p className="live"><span className="pulse" aria-hidden="true" />Live, round 2 of 3</p>
                 <h2 className="motion-title">{live.title}</h2>
@@ -53,7 +54,7 @@ export default function Feed() {
         {floor.length ? (
           <ul className="readings">
             {floor.map((m) => (
-              <li key={m.id}>
+              <li key={m.id} className={themeOf(m).className}>
                 <Link to={`/floor/${m.id}`}>
                   <span className="r-title">{m.title}<small>{m.topic}, {m.judges.toLocaleString()} judging</small></span>
                   <FrontBar share={m.share} />
@@ -70,7 +71,7 @@ export default function Feed() {
             {closed.map((m) => {
               const v = verdict(m)
               return (
-                <li key={m.id}>
+                <li key={m.id} className={themeOf(m).className}>
                   <Link to={`/verdict/${m.id}`}>
                     <span className="r-title">{m.title}<small>{m.when}</small></span>
                     <span className={`won won-${v.winner}`}>{v.winner === 'for' ? 'For' : 'Against'} won by {v.gain} points</span>
@@ -88,7 +89,7 @@ export default function Feed() {
 
 export function Storm({ m }) {
   return (
-    <Link to={`/match/${m.id}`} className="storm">
+    <Link to={`/match/${m.id}`} className={`storm ${themeOf(m).className}`}>
       <IsobarMap id={m.id} share={m.share} />
       <div className="storm-text">
         <span className="when">{m.when}</span>

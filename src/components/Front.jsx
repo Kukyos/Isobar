@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import { themeOf } from '../lib/theme.js'
 
 // The live pressure front: two air masses whose boundary sits at the vote share.
 const FRAG = `precision mediump float;
 uniform vec2 uRes; uniform float uTime; uniform float uShare;
+uniform vec3 uA0, uA1, uB0, uB1, uLine, uSeam; uniform float uLineAmt;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
@@ -15,24 +17,24 @@ void main(){
   float w=fbm(p+2.2*q+vec2(t*.7,-t));
   float edge=uShare+(w-.5)*.30+sin(uv.y*5.+t*4.)*.015;
   float side=smoothstep(edge-.03,edge+.03,uv.x);
-  vec3 paper=vec3(.914,.933,.949);
-  vec3 cold=mix(vec3(.239,.482,1.),vec3(.62,.75,1.),smoothstep(.25,.8,w));
-  vec3 warm=mix(vec3(1.,.416,.239),vec3(1.,.74,.58),smoothstep(.25,.8,w));
-  vec3 col=mix(cold,warm,side);
+  float k=smoothstep(.25,.8,w);
+  vec3 col=mix(mix(uA0,uA1,k),mix(uB0,uB1,k),side);
   float iso=abs(fract(w*10.)-.5);
-  col=mix(col,paper,smoothstep(.05,.0,iso)*.28);
-  col=mix(col,paper,smoothstep(.012,.0,abs(uv.x-edge))*.7);
+  col=mix(col,uLine,smoothstep(.05,.0,iso)*uLineAmt);
+  col=mix(col,uSeam,smoothstep(.012,.0,abs(uv.x-edge))*.7);
   gl_FragColor=vec4(col,1.);
 }`
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export default function Front({ share, className = '', children }) {
+export default function Front({ share, theme = themeOf(), className = '', children }) {
   const canvas = useRef(null)
   const target = useRef(share / 100)
   const kick = useRef(null)
   const [noGL, setNoGL] = useState(false)
   target.current = share / 100
+  const colors = useRef(theme.gl)
+  colors.current = theme.gl
 
   useEffect(() => {
     const c = canvas.current
@@ -50,6 +52,8 @@ export default function Front({ share, className = '', children }) {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0)
     const u = (k) => gl.getUniformLocation(prog, k)
     const [uRes, uTime, uShare] = [u('uRes'), u('uTime'), u('uShare')]
+    const pal = ['uA0', 'uA1', 'uB0', 'uB1', 'uLine', 'uSeam'].map(u)
+    const uLineAmt = u('uLineAmt')
 
     const fit = () => {
       const r = 0.5 // ponytail: the fluid is soft, half-res is invisible and 4-8x cheaper
@@ -65,6 +69,9 @@ export default function Front({ share, className = '', children }) {
       gl.uniform2f(uRes, c.width, c.height)
       gl.uniform1f(uTime, still ? 12 : (performance.now() - t0) / 1000 + 12)
       gl.uniform1f(uShare, cur)
+      const g = colors.current
+      ;[g.a[0], g.a[1], g.b[0], g.b[1], g.line, g.seam].forEach((c, i) => gl.uniform3fv(pal[i], c))
+      gl.uniform1f(uLineAmt, g.lineAmt)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
     function frame() {
@@ -79,11 +86,11 @@ export default function Front({ share, className = '', children }) {
     return () => { cancelAnimationFrame(raf); ro.disconnect(); gl.getExtension('WEBGL_lose_context')?.loseContext() }
   }, [])
 
-  useEffect(() => { kick.current?.() }, [share])
+  useEffect(() => { kick.current?.() }, [share, theme])
 
-  const fallback = noGL ? { background: `linear-gradient(90deg, var(--cold) ${share - 3}%, var(--warm) ${share + 3}%)` } : undefined
+  const fallback = noGL ? { background: `linear-gradient(90deg, var(--a) ${share - 3}%, var(--b) ${share + 3}%)` } : undefined
   return (
-    <div className={`front ${className}`} style={fallback}>
+    <div className={`front ${theme.className} ${className}`} style={fallback}>
       {!noGL && <canvas ref={canvas} aria-hidden="true" />}
       {children}
     </div>

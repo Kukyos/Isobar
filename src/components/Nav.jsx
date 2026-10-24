@@ -5,8 +5,8 @@ export function Mark() {
   return (
     <svg className="mark" viewBox="0 0 32 20" aria-hidden="true">
       <path d="M2 10H30" stroke="currentColor" strokeWidth="2" />
-      <path d="M4 10L9 2L14 10Z" fill="var(--cold)" />
-      <path d="M18 10A5 5 0 0 0 28 10Z" fill="var(--warm)" />
+      <path d="M4 10L9 2L14 10Z" fill="var(--a)" />
+      <path d="M18 10A5 5 0 0 0 28 10Z" fill="var(--b)" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   )
 }

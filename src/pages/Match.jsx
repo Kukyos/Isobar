@@ -5,6 +5,7 @@ import Front from '../components/Front.jsx'
 import SideLabel from '../components/SideLabel.jsx'
 import { byId, people } from '../data.js'
 import { useLiveShare } from '../lib/useLive.js'
+import { themeOf } from '../lib/theme.js'
 import NotFound from './NotFound.jsx'
 
 const ROUNDS = ['Opening', 'Rebuttal', 'Closing']
@@ -40,8 +41,8 @@ function MatchView({ m }) {
   }
 
   return (
-    <>
-      <Front share={share} className="match-band">
+    <div className={themeOf(m).className}>
+      <Front share={share} theme={themeOf(m)} className="match-band">
         <Nav onDark />
         <div className="band-in wrap">
           <p className="live">{live ? <><span className="pulse" aria-hidden="true" />Live, {m.judges.toLocaleString()} judging</> : m.when}</p>
@@ -118,6 +119,6 @@ function MatchView({ m }) {
           </aside>
         </main>
       )}
-    </>
+    </div>
   )
 }

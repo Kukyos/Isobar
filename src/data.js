@@ -13,6 +13,7 @@ export const people = {
 export const topics = ['All', 'Politics', 'Tech', 'Food', 'Culture', 'Science', 'Sport']
 
 // share = For as a % of decided votes. before/after include undecided.
+// palette: 'mono' (default) or 'party'; for_wing says which side is left-wing (US: left blue, right red).
 export const motions = [
   {
     id: 'social-under-16', kind: 'match', status: 'live', topic: 'Tech',
@@ -31,6 +32,12 @@ export const motions = [
     id: 'hot-dog', kind: 'match', status: 'upcoming', topic: 'Food', when: 'Tonight, 9:00 pm',
     title: 'A hot dog is a sandwich', for: 'dana', against: 'marco', judges: 1840, share: 49,
     before: { for: 30, against: 33, undecided: 37 }, after: { for: 41, against: 52, undecided: 7 },
+  },
+  {
+    id: 'min-wage', kind: 'match', status: 'upcoming', topic: 'Politics', when: 'Friday, 8:00 pm',
+    palette: 'party', for_wing: 'left',
+    title: 'The federal minimum wage should be $20 an hour', for: 'sam', against: 'ines', judges: 2210, share: 52,
+    before: { for: 39, against: 37, undecided: 24 }, after: { for: 44, against: 51, undecided: 5 },
   },
   {
     id: 'remote-work', kind: 'match', status: 'upcoming', topic: 'Culture', when: 'Tomorrow, 7:30 pm',
@@ -61,7 +68,8 @@ export const motions = [
   { id: 'pineapple', kind: 'floor', status: 'open', topic: 'Food', judges: 9810, share: 52, title: 'Pineapple belongs on pizza', args: [] },
   { id: 'ai-art', kind: 'floor', status: 'open', topic: 'Tech', judges: 6644, share: 39, title: 'AI art is real art', args: [] },
   { id: 'cats', kind: 'floor', status: 'open', topic: 'Culture', judges: 2290, share: 61, title: 'Cats make better roommates than people', args: [] },
-  { id: 'billionaires', kind: 'floor', status: 'open', topic: 'Politics', judges: 8120, share: 55, title: 'Billionaires should not exist', args: [] },
+  { id: 'billionaires', kind: 'floor', status: 'open', topic: 'Politics', palette: 'party', for_wing: 'left', judges: 8120, share: 55, title: 'Billionaires should not exist', args: [] },
+  { id: 'tax-cuts', kind: 'floor', status: 'open', topic: 'Politics', palette: 'party', for_wing: 'right', judges: 4410, share: 46, title: 'Income tax cuts grow the economy', args: [] },
   { id: 'oxford-comma', kind: 'floor', status: 'open', topic: 'Culture', judges: 1433, share: 68, title: 'The Oxford comma is necessary', args: [] },
   { id: 'offside', kind: 'floor', status: 'open', topic: 'Sport', judges: 3077, share: 33, title: 'Football should scrap the offside rule', args: [] },
 ]
