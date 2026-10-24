@@ -1,5 +1,7 @@
 node_modules
 dist
 .env
-.env.local
+.env.*
 .vercel
+supabase/.temp
+supabase/.branches

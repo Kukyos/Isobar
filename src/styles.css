@@ -290,7 +290,7 @@ img, svg, canvas { display: block; max-width: 100%; }
 .record dt { color: var(--muted); font-weight: 600; }
 .record dd { font: 900 clamp(2.5rem, 6vw, 4rem)/1 var(--display); font-variation-settings: 'wdth' 120; font-variant-numeric: tabular-nums; }
 .climate { display: flex; gap: 3px; height: 64px; }
-.climate span { flex: 1; border-radius: 2px; }
+.climate span { flex: 0 0 calc((100% - 47 * 3px) / 48); border-radius: 2px; }
 .c-for { background: var(--a); }
 .c-against { background: var(--b); box-shadow: inset 0 0 0 1px var(--b-line); }
 
@@ -322,4 +322,37 @@ img, svg, canvas { display: block; max-width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- backend-era additions ---------- */
+code { font-size: 0.9em; background: var(--sheet); padding: 1px 6px; border-radius: 4px; }
+.handle { font-weight: 600; color: var(--muted); }
+.vote-panel { display: grid; gap: 12px; }
+.vp-q { font: 800 1.2rem/1.15 var(--display); font-variation-settings: 'wdth' 110; }
+.vp-q:not(:first-child) { margin-top: 8px; }
+.vp-sub { font-size: 0.9rem; opacity: 0.8; margin-top: -6px; }
+.vp-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.vp-btns .btn { flex: 1 1 auto; min-height: 44px; padding: 10px 16px; }
+.vp-merit { font-size: 0.95rem; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.crowd .btn-quiet { color: var(--paper); }
+.floor-top { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: clamp(24px, 4vw, 48px); align-items: start; }
+.floor-top .crowd { position: static; }
+.form { display: grid; gap: 16px; max-width: 560px; }
+.form > label { display: grid; gap: 6px; font-weight: 600; }
+.form input:not([type='radio']), .form select, .form textarea {
+  font: inherit; color: var(--ink); background: #fff; min-height: 48px; padding: 10px 14px;
+  border: 1.5px solid #8ea3b5; border-radius: 6px; font-weight: 400;
+}
+.form input:focus-visible, .form select:focus-visible, .form textarea:focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; border-color: var(--ink); }
+.form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.pick-col { flex-direction: column; align-items: flex-start; }
+.pick-col legend { float: none; margin-bottom: 8px; font-weight: 600; color: var(--ink); }
+.pick-col label { font-weight: 500; display: flex; align-items: center; gap: 10px; }
+.pick-col input { width: 18px; height: 18px; }
+.auth { padding: 32px 0 96px; display: grid; gap: 24px; }
+.oauth { display: flex; flex-wrap: wrap; gap: 12px; }
+.switch { color: var(--muted); }
+@media (max-width: 860px) {
+  .floor-top { grid-template-columns: minmax(0, 1fr); }
 }

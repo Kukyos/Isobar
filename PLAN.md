@@ -9,7 +9,7 @@ Each phase is finished and checked before the next one starts. Each phase lives 
 - Text over the fluid: in mono it is white with `mix-blend-mode: difference`, so it is readable on both masses. In party mode it is white, on deep red or blue (at least 4.9:1).
 
 ## 2. Supabase foundation (`backend`)
-- `@supabase/supabase-js` client, reading `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `.env.local`.
+- `@supabase/supabase-js` client, reading `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from `.env.local`.
 - If those are missing, the app shows a clear "Supabase isn't configured" screen instead of a blank page.
 - SQL migrations in `supabase/migrations/`, with RLS on every table. `profiles` is created automatically on sign-up.
 - Auth: email + password and magic link. Google and X need provider setup in the Supabase dashboard (user).
@@ -37,5 +37,5 @@ Each phase is finished and checked before the next one starts. Each phase lives 
 - Audio fact checks: the speaker's browser sends audio chunks to an Edge Function, which transcribes them with Groq Whisper and feeds the text to `fact-check`.
 
 ## Secrets (set by the user; never in chat or git)
-- `.env.local` and the Vercel env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+- `.env.local` and the Vercel env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`.
 - Supabase secrets: `GROQ_API_KEY`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, `LIVEKIT_URL`.

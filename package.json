@@ -5,15 +5,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "node src/lib/contours.check.js"
+    "check": "node src/lib/contours.check.js",
+    "dev:local": "vite --mode localstack",
+    "check:rls": "node supabase/tests/rls.check.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.2",
+    "supabase": "^2.122.0",
     "vite": "^8.3.5"
   }
 }

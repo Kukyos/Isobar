@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { BRAND } from '../data.js'
+import { useAuth } from '../lib/auth.jsx'
 
 export function Mark() {
   return (
@@ -12,18 +13,35 @@ export function Mark() {
 }
 
 export default function Nav({ onDark = false }) {
+  const { profile, ready } = useAuth()
   return (
     <header className={`nav ${onDark ? 'nav-on-front' : ''}`}>
       <Link to="/" className="brand"><Mark />{BRAND}</Link>
       <nav>
         <NavLink to="/feed">Forecast</NavLink>
-        <NavLink to="/floor/compulsory-voting">Open floor</NavLink>
-        <NavLink to="/u/you" className="me" aria-label="Your profile">Y</NavLink>
+        <NavLink to="/new">New debate</NavLink>
+        {profile
+          ? <NavLink to={`/u/${profile.handle}`} className="me" aria-label="Your profile">{profile.name[0]}</NavLink>
+          : ready && <NavLink to="/signin">Sign in</NavLink>}
       </nav>
     </header>
   )
 }
 
 export function Footer() {
-  return <footer className="foot wrap"><span>{BRAND} is a prototype. Every debate here is made up.</span><Link to="/feed">Forecast</Link></footer>
+  return <footer className="foot wrap"><span>{BRAND} is in early access.</span><Link to="/feed">Forecast</Link></footer>
+}
+
+export function Loading({ what = 'Loading' }) {
+  return <main className="wrap gate"><p className="lede" role="status">{what}…</p></main>
+}
+
+export function Failed({ error, retry }) {
+  return (
+    <main className="wrap gate">
+      <h1 className="display-sm">That didn't load.</h1>
+      <p className="lede">{error?.message ?? 'Something went wrong.'}</p>
+      {retry && <div className="gate-btns"><button className="btn btn-ink" onClick={retry}>Try again</button></div>}
+    </main>
+  )
 }

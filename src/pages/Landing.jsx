@@ -1,51 +1,26 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import Nav, { Footer } from '../components/Nav.jsx'
+import Nav, { Footer, Failed, Loading } from '../components/Nav.jsx'
 import Front from '../components/Front.jsx'
 import SideLabel from '../components/SideLabel.jsx'
 import FrontBar from '../components/FrontBar.jsx'
 import { Sky } from '../components/IsobarMap.jsx'
 import { Storm } from './Feed.jsx'
-import { motions, people } from '../data.js'
+import { listMotions, useLive, useQuery, useVote } from '../lib/db.js'
 import { themeOf } from '../lib/theme.js'
-import { useLiveShare } from '../lib/useLive.js'
-
-const live = motions.find((m) => m.status === 'live')
 
 export default function Landing() {
-  const [share, nudge] = useLiveShare(live.share)
-  const [mine, setMine] = useState(null)
-  const vote = (side) => {
-    if (mine === side) return
-    nudge(side === 'for' ? 4 : -4)
-    setMine(side)
-  }
-  const upcoming = motions.filter((m) => m.status === 'upcoming')
-  const floor = motions.filter((m) => m.kind === 'floor').slice(0, 5)
+  const q = useQuery(listMotions, [])
+  if (q.error) return <><Nav /><Failed error={q.error} retry={q.reload} /></>
+  if (!q.data) return <><Nav /><Loading what="Loading the forecast" /></>
+
+  const all = q.data
+  const featured = all.find((m) => m.status === 'live') ?? all.find((m) => m.status === 'open')
+  const upcoming = all.filter((m) => m.status === 'upcoming').slice(0, 3)
+  const floor = all.filter((m) => m.kind === 'floor' && m.status === 'open').slice(0, 5)
 
   return (
     <>
-      <Front share={share} theme={themeOf(live)} className="hero">
-        <Nav onDark />
-        <div className="hero-in">
-          <p className="live"><span className="pulse" aria-hidden="true" />Live now, {live.judges.toLocaleString()} people judging</p>
-          <h1 className="motion-title">{live.title}</h1>
-          <p className="hero-who">{people[live.for].name} for, {people[live.against].name} against</p>
-          <div className="sides">
-            <SideLabel side="for" share={share} />
-            <SideLabel side="against" share={100 - share} />
-          </div>
-          <div className="vote-row">
-            <button className="btn btn-for" aria-pressed={mine === 'for'} onClick={() => vote('for')}>Vote For</button>
-            <button className="btn btn-against" aria-pressed={mine === 'against'} onClick={() => vote('against')}>Vote Against</button>
-            <Link className="btn btn-ghost" to={`/match/${live.id}`}>Watch the match</Link>
-          </div>
-          <p className="hero-note" aria-live="polite">
-            {mine ? `You voted ${mine === 'for' ? 'For' : 'Against'}. You can change your mind until the closing round ends.` : ' '}
-          </p>
-        </div>
-      </Front>
-
+      {featured ? <Hero m={featured} /> : <Nav />}
       <main>
         <section className="pitch wrap">
           <h2 className="display">Settle it in public.</h2>
@@ -64,23 +39,23 @@ export default function Landing() {
           </figure>
         </section>
 
-        <section className="wrap">
-          <div className="sec-head"><h2>Coming up</h2><Link to="/feed">Full forecast</Link></div>
-          <div className="upcoming">
-            {upcoming.map((m) => <Storm key={m.id} m={m} />)}
-          </div>
-        </section>
+        {upcoming.length > 0 && (
+          <section className="wrap">
+            <div className="sec-head"><h2>Coming up</h2><Link to="/feed">Full forecast</Link></div>
+            <div className="upcoming">{upcoming.map((m) => <Storm key={m.id} m={m} />)}</div>
+          </section>
+        )}
 
         <section className="wrap">
-          <div className="sec-head"><h2>On the open floor</h2><Link to="/feed">All motions</Link></div>
+          <div className="sec-head"><h2>On the open floor</h2><Link to="/new">Open a motion</Link></div>
           <p className="sec-sub">No speakers, no clock. Anyone can add an argument and the best ones rise.</p>
           <ul className="readings">
             {floor.map((m) => (
               <li key={m.id} className={themeOf(m).className}>
-                <Link to={`/floor/${m.id}`}>
+                <Link to={`/floor/${m.slug}`}>
                   <span className="r-title">{m.title}</span>
                   <FrontBar share={m.share} />
-                  <span className="r-num">{m.share}% for</span>
+                  <span className="r-num">{Math.round(m.share)}% for</span>
                 </Link>
               </li>
             ))}
@@ -89,5 +64,36 @@ export default function Landing() {
       </main>
       <Footer />
     </>
+  )
+}
+
+function Hero({ m: base }) {
+  const m = useLive(base)
+  const v = useVote(m.id)
+  const isMatch = m.kind === 'match'
+  return (
+    <Front share={m.share} theme={themeOf(m)} className="hero">
+      <Nav onDark />
+      <div className="hero-in">
+        <p className="live">
+          {isMatch && <span className="pulse" aria-hidden="true" />}
+          {isMatch ? 'Live now' : 'On the open floor'}, {m.judges.toLocaleString()} judging
+        </p>
+        <h1 className="motion-title">{m.title}</h1>
+        {isMatch && m.for_profile && <p className="hero-who">{m.for_profile.name} for, {m.against_profile?.name} against</p>}
+        <div className="sides">
+          <SideLabel side="for" share={m.share} />
+          <SideLabel side="against" share={100 - m.share} />
+        </div>
+        <div className="vote-row">
+          <button className="btn btn-for" aria-pressed={v.vote?.side === 'for'} onClick={() => v.cast({ side: 'for' })}>Vote For</button>
+          <button className="btn btn-against" aria-pressed={v.vote?.side === 'against'} onClick={() => v.cast({ side: 'against' })}>Vote Against</button>
+          <Link className="btn btn-ghost" to={isMatch ? `/match/${m.slug}` : `/floor/${m.slug}`}>{isMatch ? 'Watch the match' : 'Read the arguments'}</Link>
+        </div>
+        <p className="hero-note" aria-live="polite">
+          {v.error || (v.vote ? `You voted ${v.vote.side === 'for' ? 'For' : v.vote.side === 'against' ? 'Against' : 'not sure'}. You can change your mind until it closes.` : ' ')}
+        </p>
+      </div>
+    </Front>
   )
 }
